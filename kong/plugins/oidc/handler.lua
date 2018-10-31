@@ -43,8 +43,16 @@ function handle(oidcConfig)
 end
 
 function make_oidc(oidcConfig)
+  local res, err
+
   ngx.log(ngx.DEBUG, "OidcHandler calling authenticate, requested path: " .. ngx.var.request_uri)
-  local res, err = require("resty.openidc").authenticate(oidcConfig)
+
+  if report_401_on_auth_failure == "yes" then
+    res, err = require("resty.openidc").authenticate(oidcConfig, ngx.var.request_uri, "pass")
+  else
+    res, err = require("resty.openidc").authenticate(oidcConfig)
+  end
+
   if err then
     if oidcConfig.recovery_page_path then
       ngx.log(ngx.DEBUG, "Entering recovery page: " .. oidcConfig.recovery_page_path)
