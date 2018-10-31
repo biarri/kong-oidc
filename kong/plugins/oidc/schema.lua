@@ -13,7 +13,7 @@ return {
     scope = { type = "string", required = true, default = "openid" },
     response_type = { type = "string", required = true, default = "code" },
     ssl_verify = { type = "string", required = true, default = "no" },
-    401_on_auth_failure = { type = "string", required = false, default = "no" },
+    report_401_on_auth_failure = { type = "string", required = false, default = "no" },
     token_endpoint_auth_method = { type = "string", required = true, default = "client_secret_post" },
     session_secret = { type = "string", required = false },
     recovery_page_path = { type = "string" },
