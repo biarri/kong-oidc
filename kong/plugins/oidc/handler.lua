@@ -50,7 +50,7 @@ function make_oidc(oidcConfig)
       ngx.log(ngx.DEBUG, "Entering recovery page: " .. oidcConfig.recovery_page_path)
       ngx.redirect(oidcConfig.recovery_page_path)
     end
-    if oidcConfig.401_on_auth_failure then
+    if oidcConfig.401_on_auth_failure == "yes" then
       ngx.header["WWW-Authenticate"] = 'Bearer realm="' .. oidcConfig.realm .. '",error="' .. err .. '"'
       utils.exit(ngx.HTTP_UNAUTHORIZED, err, ngx.HTTP_UNAUTHORIZED)
     else
