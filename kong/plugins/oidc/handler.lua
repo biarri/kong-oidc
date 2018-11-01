@@ -47,7 +47,7 @@ function make_oidc(oidcConfig)
 
   ngx.log(ngx.DEBUG, "OidcHandler calling authenticate, requested path: " .. ngx.var.request_uri)
 
-  if report_401_on_auth_failure == "yes" then
+  if oidcConfig.report_401_on_auth_failure == "yes" then
     res, err = require("resty.openidc").authenticate(oidcConfig, ngx.var.request_uri, "pass")
   else
     res, err = require("resty.openidc").authenticate(oidcConfig)
