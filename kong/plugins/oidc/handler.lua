@@ -43,36 +43,23 @@ function handle(oidcConfig)
 end
 
 function make_oidc(oidcConfig)
-  local res, err
-
   ngx.log(ngx.DEBUG, "OidcHandler calling authenticate, requested path: " .. ngx.var.request_uri)
-
-  if oidcConfig.report_401_on_auth_failure == "yes" then
-    res, err = require("resty.openidc").authenticate(oidcConfig, ngx.var.request_uri)
-  else
-    res, err = require("resty.openidc").authenticate(oidcConfig)
-  end
-
+  local res, err = require("resty.openidc").authenticate(oidcConfig)
   if err then
     if oidcConfig.recovery_page_path then
       ngx.log(ngx.DEBUG, "Entering recovery page: " .. oidcConfig.recovery_page_path)
       ngx.redirect(oidcConfig.recovery_page_path)
     end
-    if oidcConfig.report_401_on_auth_failure == "yes" then
-      ngx.header["WWW-Authenticate"] = 'Bearer realm="' .. oidcConfig.realm .. '",error="' .. err .. '"'
-      utils.exit(ngx.HTTP_UNAUTHORIZED, err, ngx.HTTP_UNAUTHORIZED)
-    else
-      utils.exit(500, err, ngx.HTTP_INTERNAL_SERVER_ERROR)
-    end
+    utils.exit(500, err, ngx.HTTP_INTERNAL_SERVER_ERROR)
   end
   return res
 end
 
 function introspect(oidcConfig)
-  if utils.has_bearer_access_token() or oidcConfig.bearer_only == "yes" then
+  if utils.has_bearer_access_token() or oidcConfig.bearer_only == "yes" or oidcConfig.report_401_on_auth_failure == "yes" then
     local res, err = require("resty.openidc").introspect(oidcConfig)
     if err then
-      if oidcConfig.bearer_only == "yes" then
+      if oidcConfig.bearer_only == "yes" or oidcConfig.report_401_on_auth_failure == "yes" then
         ngx.header["WWW-Authenticate"] = 'Bearer realm="' .. oidcConfig.realm .. '",error="' .. err .. '"'
         utils.exit(ngx.HTTP_UNAUTHORIZED, err, ngx.HTTP_UNAUTHORIZED)
       end
